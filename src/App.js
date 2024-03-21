@@ -199,6 +199,10 @@ function WatchedMovie({ movie }) {
   );
 }
 
+function Loader(){
+  return <p className="loader"> Loading .... </p>
+}
+
 const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
@@ -207,8 +211,9 @@ const I_KEY = "tt3896198";
 
 export default function App() {
 
-  const [movies, setMovies] = useState(tempMovieData);
-  const [watched, setWatched] = useState(tempWatchedData);
+  const [movies, setMovies] = useState([]);
+  const [watched, setWatched] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const query ="harry potter";
 
   
@@ -221,10 +226,12 @@ export default function App() {
 
     // React strict mode, will run twice - when production, will not happening 
     async function fetchMovies() {
+      setIsLoading(true);
       const res = await fetch(`https://www.omdbapi.com/?i=${I_KEY}&apiKey=${API_KEY}&s=${query}`);
       const data = await res.json(); 
       setMovies(data.Search);
       console.log('movies', movies); // stale state 
+      setIsLoading(false);
     }
 
     fetchMovies();
@@ -241,7 +248,7 @@ export default function App() {
       </NavBar>
       <Main>
         <Box>
-          <MovieList movies={movies} />
+          {isLoading? <Loader/> : <MovieList movies={movies} />}
         </Box>
 
         <Box> 
