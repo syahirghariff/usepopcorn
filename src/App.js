@@ -209,12 +209,26 @@ export default function App() {
 
   const [movies, setMovies] = useState(tempMovieData);
   const [watched, setWatched] = useState(tempWatchedData);
+  const query ="harry potter";
 
   
   useEffect(()=>{
-    fetch(`https://www.omdbapi.com/?i=${I_KEY}&apiKey=${API_KEY}&s=harry potter`)
-    .then((res)=> res.json())
-    .then((data)=> setMovies(data.Search));
+
+    // fetch(`https://www.omdbapi.com/?i=${I_KEY}&apiKey=${API_KEY}&s=harry potter`)
+    //   .then((res)=> res.json())
+    //   .then((data)=> setMovies(data.Search));
+
+
+    // React strict mode, will run twice - when production, will not happening 
+    async function fetchMovies() {
+      const res = await fetch(`https://www.omdbapi.com/?i=${I_KEY}&apiKey=${API_KEY}&s=${query}`);
+      const data = await res.json(); 
+      setMovies(data.Search);
+      console.log('movies', movies); // stale state 
+    }
+
+    fetchMovies();
+    
   },[])
 
   
