@@ -173,6 +173,22 @@ function MovieDetails({selectedId, onCloseMovie, onAddWatched, watched}){
     onCloseMovie();
   }
 
+  useEffect(() => {
+
+    // add/remove must have same callback
+    function callback(event){
+      if(event.code === 'Escape') {
+        onCloseMovie();
+        console.log('CLOSING');
+      }
+    }
+    document.addEventListener('keydown', callback)
+
+    return function () {
+      document.removeEventListener('keydown', callback); 
+    }
+  }, [onCloseMovie])
+
   useEffect(()=> {
     async function getMovieDetails(){
       setIsLoading(true);
@@ -361,6 +377,8 @@ export default function App() {
   function handleDeleteWatched(id) {
     setWatched(watched=> watched.filter(movie=>movie.imdbID !== id));
   }
+
+  
   
   useEffect(()=>{
 
@@ -402,6 +420,8 @@ export default function App() {
       setError('');
       return; 
     }
+
+    handleCloseMovie();
 
     fetchMovies();
 
