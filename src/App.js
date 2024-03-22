@@ -321,7 +321,7 @@ const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
 const API_KEY = "637df1cb";
-const I_KEY = "tt3896198";
+// const I_KEY = "tt3896198";
 
 export default function App() {
 
@@ -367,13 +367,17 @@ export default function App() {
     // fetch(`https://www.omdbapi.com/?i=${I_KEY}&apiKey=${API_KEY}&s=harry potter`)
     //   .then((res)=> res.json())
     //   .then((data)=> setMovies(data.Search));
+    
+    const controller = new AbortController(); 
 
     // React strict mode, will run twice - when production, will not happening 
     async function fetchMovies() {
       try {
         setIsLoading(true);
         setError('');
-        const res = await fetch(`https://www.omdbapi.com/?apiKey=${API_KEY}&s=${query}`);
+        const res = await fetch(`https://www.omdbapi.com/?apiKey=${API_KEY}&s=${query}`,
+         {signal: controller.signal }
+        );
         if (!res.ok) {
           throw new Error ("Something went wrong with fetching movies");
         }
@@ -382,8 +386,12 @@ export default function App() {
           throw new Error ("Movie not found");
         }
         setMovies(data.Search);
+        setError("");
       } catch (error) {
-        setError(error.message);
+        if (error.name !== "AbortError") {
+          setError(error.message);
+        }
+        
       } finally {
         setIsLoading(false);
       }
@@ -396,6 +404,10 @@ export default function App() {
     }
 
     fetchMovies();
+
+    return function() {
+      controller.abort();
+    }
   },[query])
 
   return (
