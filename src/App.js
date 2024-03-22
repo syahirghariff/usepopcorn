@@ -73,8 +73,7 @@ function Logo() {
   );
 }
 
-function Search() {
-  const [query, setQuery] = useState("");
+function Search({query, setQuery}) {
 
   return (
     <input
@@ -219,12 +218,23 @@ const I_KEY = "tt3896198";
 
 export default function App() {
 
+  const [query, setQuery] = useState("");
   const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const query ="harry potterxxx";
 
+  /*
+  useEffect(()=>{
+    console.log('A');
+  }, []) 
+
+  useEffect(()=>{
+    console.log('B');
+  })
+
+  console.log('c');
+  */
   
   useEffect(()=>{
 
@@ -232,40 +242,40 @@ export default function App() {
     //   .then((res)=> res.json())
     //   .then((data)=> setMovies(data.Search));
 
-
     // React strict mode, will run twice - when production, will not happening 
     async function fetchMovies() {
       try {
         setIsLoading(true);
+        setError('');
         const res = await fetch(`https://www.omdbapi.com/?i=${I_KEY}&apiKey=${API_KEY}&s=${query}`);
         if (!res.ok) {
           throw new Error ("Something went wrong with fetching movies");
         }
-
         const data = await res.json(); 
-
         if (data.Response === 'False'){
           throw new Error ("Movie not found");
         }
-
         setMovies(data.Search);
-        console.log('movies', movies); // stale state 
       } catch (error) {
-        console.log('error', error);
         setError(error.message);
       } finally {
         setIsLoading(false);
       }
     }
-    fetchMovies();
-  },[])
 
-  
+    if (query.length < 3) {
+      setMovies([]);
+      setError('');
+      return; 
+    }
+
+    fetchMovies();
+  },[query])
 
   return (
     <>
       <NavBar>
-        <Search />
+        <Search query={query} setQuery={setQuery}/>
         <NumResults movies={movies} />
       </NavBar>
       <Main>
